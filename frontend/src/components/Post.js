@@ -1,8 +1,19 @@
+import { useState } from 'react'
 import { Avatar} from '@material-ui/core'
 import { ArrowDownwardOutlined, ArrowUpwardOutlined,  ChatBubbleOutlined,  MoreHorizOutlined,  RepeatOneOutlined, ShareOutlined } from '@material-ui/icons'
 import React from 'react'
+import CloseIcon from '@material-ui/icons/Close'
 import './css/Post.css'
+import './css/BeloggHeader.css'
+import Modal from 'react-responsive-modal';
+import 'react-responsive-modal/styles.css'
+import ReactQuill from 'react-quill'
+import "react-quill/dist/quill.snow.css"
 function Post() {
+  const [isModalOpen, setisModalOpen] = useState(false)
+  const Close = (
+    <CloseIcon />
+  )
   return (
     <div className='post'>
         <div className='post__info'>
@@ -12,7 +23,36 @@ function Post() {
         </div>
         <div className='post__body'>
             <p>This is a test post</p>
-            <button className='post__btnAnswer'>Comments</button>
+            <button onClick={() => setisModalOpen(true)} className='post__btnAnswer'>Comments</button>
+            <Modal
+            open = {isModalOpen}
+            closeIcon = {Close}
+            onClose = {() => setisModalOpen(false)}
+            closeOnEsc
+            center
+            closeOnOverlayClick = {false}
+            styles={{
+              overlay:{
+                height:"auto"
+              }
+            }}
+            >
+            <div className='modal__question'>
+                <h1>This is test question</h1>
+                <p>asked by {" "} <span className='name'>Username</span>  on <span className='name'> timestamp</span></p>
+            </div>
+            <div className='modal__answer'>
+                <ReactQuill placeholder='Enter your answer' />
+            </div>
+            <div className='modal__buttons'>
+                    <button className='cancle' onClick={()=>setisModalOpen(false)}>
+                    Cancel
+                    </button>
+                    <button type='submit' className='add' >
+                    Add Question
+                    </button>
+            </div>
+            </Modal>
         </div>
         <div className='post__footer'>
             <div className='post__footerAction'>
