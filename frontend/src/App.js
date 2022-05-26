@@ -1,10 +1,11 @@
 import './App.css';
-import Belogg from './components/Belogg';
+import Belogg from './components/Belogg'
 
 function App() {
   return (
     <div >
       <Belogg />
+      
     </div>
   );
 }
