@@ -5,6 +5,8 @@ const bodyParser = require('body-parser')
 const app = express()
 const PORT = 80
 const db = require('./db.js')
+const router = require('./routes/index')
+// const router = require('./routes')
 // database
 db.connect()
 
@@ -16,22 +18,24 @@ app.use(bodyParser.urlencoded({extended:true, limit:"50mb"}))
 
 // cors
 app.use((req, res , next) =>{
-    req.headers("Access-Control-Allow-Origin" , "*")
-    req.headers("Access-Control-Allow-Headers" , "*")
+    req.header("Access-Control-Allow-Origin" , "*")
+    req.header("Access-Control-Allow-Headers" , "*")
     next()
 })
 
 
 // routes
 
-
+app.use("/api" , router)
 
 app.use("/uploads" , express.static(path.join(__dirname,"/../uploads")))
-app.use("/uploads" , express.static(path.join(__dirname,"/../frontend/build")))
+app.use(express.static(path.join(__dirname,"/../frontend/build")))
 
 app.get("*" , (req,res) => {
     try{
         res.sendFile(path.join(`${__dirname}/../frontend/build/index.html`))
+        // res.sendFile(path.join(`${__dirname}/../frontend/public/index.html`))
+
     }
     catch(e){
         res.send("Oops! unexpected error")
