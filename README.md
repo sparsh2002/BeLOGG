@@ -1,0 +1,1 @@
+This is a blogging app name "BeLOGG" build on MERN stack
