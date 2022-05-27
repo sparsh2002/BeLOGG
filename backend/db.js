@@ -1,6 +1,9 @@
 const mongoose = require('mongoose')
-const url = "mongodb+srv://sparsh2002:sparsh3435@mycluster.bt23o.mongodb.net/?retryWrites=true&w=majority"
-
+const dotenv = require('dotenv')
+dotenv.config()
+const url = process.env.URI
+// console.log(process.env)
+// console.log(url)
 module.exports.connect = () =>{
     mongoose.connect(url , {
         useNewUrlParser :true,
