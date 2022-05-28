@@ -9,21 +9,60 @@ import Modal from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css'
 import ReactQuill from 'react-quill'
 import "react-quill/dist/quill.snow.css"
-function Post() {
+import ReactTimeAgo from "react-time-ago";
+import  ReactHTMLParser  from 'html-react-parser'
+import axios from 'axios'
+function LastSeen({ date }) {
+  return (
+    <div>
+      <ReactTimeAgo date={date} locale="en-US" timeStyle="twitter" />
+    </div>
+  );
+}
+function Post({post}) {
   const [isModalOpen, setisModalOpen] = useState(false)
+  const [answer, setAnswer] = useState("")
   const Close = (
     <CloseIcon />
   )
+  const handleQuill = (value) =>{
+    setAnswer(value)
+  }
+  const handleSubmit = async () =>{
+    if(post?._id && answer!==""){
+      const config = {
+        headers:{
+          "Content-Type" : "application/json",
+        },
+      }
+      const body = {
+        answer:answer,
+        questionId :post?._id
+      }
+      await axios.post('/api/answers' , body  , config)
+      // await axios.post('http://192.168.1.4:80/api/answers' , body , config )
+      .then(res=>{
+        console.log(res)
+        alert('Answer added successfully')
+        window.location.href = "/"
+      }).catch(e=>{
+        console.log(e)
+      })
+    }
+  }
+  // console.log(answer)
   return (
     <div className='post'>
         <div className='post__info'>
             <Avatar />
             <h4>User Name</h4>
-            <small>Time Stamp</small>
+            <small><LastSeen date = {post?.createdAt}/></small>
         </div>
         <div className='post__body'>
-            <p>This is a test post</p>
-            <button onClick={() => setisModalOpen(true)} className='post__btnAnswer'>Comments</button>
+            <div className='post__question'>
+            <p>{post?.questionName}</p>
+            <button onClick={() => setisModalOpen(true)} 
+            className='post__btnAnswer'>Comments</button>
             <Modal
             open = {isModalOpen}
             closeIcon = {Close}
@@ -38,21 +77,25 @@ function Post() {
             }}
             >
             <div className='modal__question'>
-                <h1>This is test question</h1>
-                <p>asked by {" "} <span className='name'>Username</span>  on <span className='name'> timestamp</span></p>
+                <h1>{post?.questionName}</h1>
+                <p>asked by {" "} <span className='name'>Username</span>  on <span className='name'>{new Date(post?.createdAt).toLocaleString()} </span></p>
             </div>
             <div className='modal__answer'>
-                <ReactQuill placeholder='Enter your answer' />
+                <ReactQuill value={answer} onChange={handleQuill} placeholder='Enter your answer' />
             </div>
-            <div className='modal__buttons'>
+            <div className='modal__button'>
                     <button className='cancle' onClick={()=>setisModalOpen(false)}>
                     Cancel
                     </button>
-                    <button type='submit' className='add' >
-                    Add Question
+                    <button onClick = {handleSubmit} type='submit' className='add' >
+                    Add Answer
                     </button>
             </div>
             </Modal>
+            </div>
+        {
+         post.questionUrl!=="" && <img src={post.questionUrl} alt='url' />
+        }
         </div>
         <div className='post__footer'>
             <div className='post__footerAction'>
@@ -71,7 +114,9 @@ function Post() {
           fontSize: "12px",
           fontWeight: "bold",
           margin: "10px 0",
-        }}>1 answer</p>
+        }}>
+          {post?.allAnswers.length} Answer(s)
+        </p>
         <div style={{
           margin: "5px 0px 0px 0px ",
           padding: "5px 0px 0px 20px",
@@ -86,28 +131,38 @@ function Post() {
                 // borderTop: "1px solid lightgray",
               }}
               className='post-answer-container'>
-                <div style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "10px",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  color: "#888",
-                }}
-                className='post-answered'>
-                    <Avatar />
-                    <div  style={{
-                    margin: "0px 10px",
-                  }} className='post-info'>
-                        <p>
-                            username    
-                        </p>
-                        <span>Time Stamp</span>
+                {
+                  post?.allAnswers?.map(_a =>(
+                    <>
+                    <div style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: "10px",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      color: "#888",
+                    }}
+                    className='post-answered'>
+    
+                        <Avatar />
+                        <div  style={{
+                        margin: "0px 10px",
+                      }} className='post-info'>
+                            <p>
+                                username    
+                            </p>
+                            <span><LastSeen date = {_a?.createdAt} /></span>
+                        </div>
+                        
                     </div>
-                </div>
-                <div className='post-answer'>
-                    This is test comment
-                </div>
+                    <div className='post-answer'>
+                    {ReactHTMLParser(_a?.answer)}
+                   </div>
+                   </>
+                  ))
+                }
+               
+               
             </div>
         </div>
     </div>

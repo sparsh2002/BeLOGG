@@ -14,11 +14,11 @@ router.post('/' , async (req , res)=>{
                 status:true,
                 message:'answer added successfully'
             })
-            .catch((err)=>{
-                res.status(400).send({
-                    status :'false',
-                    message:'Bad Request'
-                })
+        })
+        .catch((err)=>{
+            res.status(400).send({
+                status :'false',
+                message:'Bad Request'
             })
         })
     }

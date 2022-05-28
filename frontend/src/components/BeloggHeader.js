@@ -18,12 +18,37 @@ import CloseIcon from '@material-ui/icons/Close'
 import './css/BeloggHeader.css'
 import Modal from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css'
+import axios from 'axios'
 function BeloggHeader() {
   const [isModalOpen, setisModalOpen] = useState(false)
   const [inputUrl, setInputUrl] = useState('')
+  const [question , setQuestion] = useState('')
   const Close = (
     <CloseIcon />
   )
+  const handleSubmit = async () =>{
+    const config ={
+      headers:{
+        "Content-Type" : "application/json"
+      }
+    }
+    if(question!==""){
+      const body = {
+        questionName : question,
+        questionUrl : inputUrl
+      }
+      await axios.post("/api/questions" , body , config)
+      // await axios.post("http://192.168.1.4:80/api/questions" , body , config)
+      .then((res)=>{
+        console.log(res.data)
+        alert(res.data.message)
+        window.location.href = "/"
+      }).catch(e =>{
+        console.log(e)
+        alert('Question cant be added')
+      })
+    }
+  }
   return (
     <div className='bHeader'>
         <div className='bHeader-content'>
@@ -72,7 +97,10 @@ function BeloggHeader() {
                   </div>
               </div>
               <div className='modal__Field'>
-                  <Input className='modal__fieldLink' type='text' placeholder="Start your question with 'What', 'How', 'Why', etc."/>
+                  <Input 
+                  value = {question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  className='modal__fieldLink' type='text' placeholder="Start your question with 'What', 'How', 'Why', etc."/>
                   <div
                   style={{
                     display:'flex',
@@ -105,7 +133,7 @@ function BeloggHeader() {
                 <button className='cancle' onClick={()=>setisModalOpen(false)}>
                   Cancel
                 </button>
-                <button type='submit' className='add' >
+                <button onClick = {handleSubmit} type='submit' className='add' >
                   Add Question
                 </button>
               </div>

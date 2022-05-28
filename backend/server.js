@@ -17,6 +17,8 @@ app.use(bodyParser.urlencoded({extended:true, limit:"50mb"}))
 
 
 // cors
+app.use(cors())
+
 app.use((req, res , next) =>{
     req.header("Access-Control-Allow-Origin" , "*")
     req.header("Access-Control-Allow-Headers" , "*")
