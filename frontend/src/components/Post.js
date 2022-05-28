@@ -11,7 +11,9 @@ import ReactQuill from 'react-quill'
 import "react-quill/dist/quill.snow.css"
 import ReactTimeAgo from "react-time-ago";
 import  ReactHTMLParser  from 'html-react-parser'
+import {useSelector} from 'react-redux'
 import axios from 'axios'
+import { selectUser } from '../feature/userSlice'
 function LastSeen({ date }) {
   return (
     <div>
@@ -22,6 +24,7 @@ function LastSeen({ date }) {
 function Post({post}) {
   const [isModalOpen, setisModalOpen] = useState(false)
   const [answer, setAnswer] = useState("")
+  const user =  useSelector(selectUser)
   const Close = (
     <CloseIcon />
   )
@@ -37,7 +40,8 @@ function Post({post}) {
       }
       const body = {
         answer:answer,
-        questionId :post?._id
+        questionId :post?._id,
+        user:user
       }
       await axios.post('/api/answers' , body  , config)
       // await axios.post('http://192.168.1.4:80/api/answers' , body , config )
@@ -54,8 +58,8 @@ function Post({post}) {
   return (
     <div className='post'>
         <div className='post__info'>
-            <Avatar />
-            <h4>User Name</h4>
+            <Avatar src={post?.user?.photo} />
+            <h4> {post?.user?.userName}</h4>
             <small><LastSeen date = {post?.createdAt}/></small>
         </div>
         <div className='post__body'>
@@ -144,12 +148,12 @@ function Post({post}) {
                     }}
                     className='post-answered'>
     
-                        <Avatar />
+                        <Avatar src={_a?.user?.photo} />
                         <div  style={{
                         margin: "0px 10px",
                       }} className='post-info'>
                             <p>
-                                username    
+                               {_a?.user?.userName}
                             </p>
                             <span><LastSeen date = {_a?.createdAt} /></span>
                         </div>

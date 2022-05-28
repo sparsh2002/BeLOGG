@@ -19,6 +19,10 @@ import './css/BeloggHeader.css'
 import Modal from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css'
 import axios from 'axios'
+import { auth } from "../firebase";
+import { signOut } from "firebase/auth";
+import { logout, selectUser } from "../feature/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 function BeloggHeader() {
   const [isModalOpen, setisModalOpen] = useState(false)
   const [inputUrl, setInputUrl] = useState('')
@@ -26,6 +30,20 @@ function BeloggHeader() {
   const Close = (
     <CloseIcon />
   )
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const handleLogout = () => {
+    if (window.confirm("Are you sure to logout ?")) {
+      signOut(auth)
+        .then(() => {
+          dispatch(logout());
+          console.log("Logged out");
+        })
+        .catch(() => {
+          console.log("error in logout");
+        });
+    }
+  };
   const handleSubmit = async () =>{
     const config ={
       headers:{
@@ -35,7 +53,8 @@ function BeloggHeader() {
     if(question!==""){
       const body = {
         questionName : question,
-        questionUrl : inputUrl
+        questionUrl : inputUrl,
+        user:user
       }
       await axios.post("/api/questions" , body , config)
       // await axios.post("http://192.168.1.4:80/api/questions" , body , config)
@@ -68,7 +87,9 @@ function BeloggHeader() {
               <input type='text' placeholder='Search Topics' />
             </div>
             <div className='bHeader-Rem'>
-              <Avatar />
+            <span onClick={handleLogout}>
+            <Avatar src={user?.photo} />
+          </span>
             </div>
             <Button onClick={() => setisModalOpen(true)}>Add Topic</Button>
             <Modal
